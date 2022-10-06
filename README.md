@@ -8,7 +8,7 @@ The following parameters are optimized, using NSGA-II genetic algorithm, in orde
 - Air Changes per Hour (ACH)
 - Window Shading Control
 - Window Glazing
-- 
+
 Influx-DB was used as database and visualziation tool of the simulation data coming from EnergyPlus.  
 
 Afterwards, the energy signature of the building was calculate through univariate and multivariate regression.
