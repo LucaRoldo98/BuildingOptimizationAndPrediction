@@ -1,0 +1,78 @@
+#############Parametric analysis for U values:
+We take our model and we modify the thickness of all the insulation materials checking some target parameters.
+The target parameters are: DistrictHeating:Facility and DistrictCooling:Facility. Eventually also DistrictHeating:Facility
+
+
+
+#############Parametric analysis for Shading:
+When dealing with shading, in the IDF will appear a field "WindowShadingCOntrol" repeated many times, one per each zone where a shading is applied.
+It appears like:
+
+WindowShadingControl,
+    1001-Block1:Zone3,       !- Name
+    Block1:Zone3,            !- Zone Name
+    1,                       !- Shading Control Sequence Number
+    InteriorBlind,           !- Shading Type
+    2001,                    !- Construction with Shading Name
+    OnIfHighSolarOnWindow,   !- Shading Control Type
+    Dwell_DomDining_Occ,     !- Schedule Name
+    300,                     !- Setpoint {W/m2, W or deg C}
+    Yes,                     !- Shading Control Is Scheduled
+    No,                      !- Glare Control Is Active
+    ,                        !- Shading Device Material Name
+    FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
+    0,                       !- Setpoint 2 {W/m2 or deg C}
+    Block1:Zone3,            !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Block1:Zone3_Wall_5_0_0_0_0_0_Win,  !- Fenestration Surface 1 Name
+    Block1:Zone3_Wall_6_0_0_0_0_0_Win;  !- Fenestration Surface 2 Name
+
+We have to modify the shading control type and we can do it in different ways, depending on the requests (to check all the method, go on the documentation of e+ at page 377/378). For us
+potentially the only useful are:
+-OnIfHighSolarOnWindow
+-OnIfHighOutdoorAirTemperature
+-OnIfHighOutdoorAirTempAndHighSolarOnWindow => cool but I think it's slightly restrictive. The description on the documentation says: "Shading is on if the outside air temperature
+exceeds the Setpoint (C) and if the solar radiation incident on the window exceeds SetPoint 2 (W/m2)" which basically is a AND operation, but we'd prefer to have an OR operation
+
+Then for the setpoints we can modify Setpoint {W/m2, W or deg C} or/and Setpoint 2 {W/m2 or deg C} depending on the control strategy => check which are the best intervals
+After the setup, repeat the simulation and extract again the same energy consumption parameters.
+NOTA: it would be cool to do the multivariate analysis with shading and U values, but probably computationally expensive.
+
+#############Parametric analysis for Natural Ventilation:
+Regarding the natural ventilation, we have to check the fields of "ZoneVentilation:DesignFlowRate", looking like:
+
+ZoneVentilation:DesignFlowRate,
+    Block1:Zone3 Nat Vent,   !- Name
+    Block1:Zone3,            !- Zone or ZoneList Name
+    Dwell_DomDining_Occ,     !- Schedule Name
+    Flow/zone,               !- Design Flow Rate Calculation Method
+    .172359,                 !- Design Flow Rate {m3/s}
+    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Person {m3/s-person}
+    ,                        !- Air Changes per Hour {1/hr}
+    NATURAL,                 !- Ventilation Type
+    0,                       !- Fan Pressure Rise {Pa}
+    1,                       !- Fan Total Efficiency
+    1,                       !- Constant Term Coefficient
+    0,                       !- Temperature Term Coefficient
+    0,                       !- Velocity Term Coefficient
+    0,                       !- Velocity Squared Term Coefficient
+    20,                      !- Minimum Indoor Temperature {C}
+    ,                        !- Minimum Indoor Temperature Schedule Name
+    100,                     !- Maximum Indoor Temperature {C}
+    ,                        !- Maximum Indoor Temperature Schedule Name
+    0,                       !- Delta Temperature {deltaC}
+    ,                        !- Delta Temperature Schedule Name
+    20,                      !- Minimum Outdoor Temperature {C}
+    ,                        !- Minimum Outdoor Temperature Schedule Name
+    24,                      !- Maximum Outdoor Temperature {C}
+    ,                        !- Maximum Outdoor Temperature Schedule Name
+    40;                      !- Maximum Wind Speed {m/s}
+
+Here there should be the set points and the ACH => Minimum Outdoor Temperature {C}, Maximum Outdoor Temperature {C}, Air Changes per Hour {1/hr}.
+What we should check is the field "Design Flow Rate Calculation Method" and what type of method we should insert (All the methods can be found at page 650 of the e+ documentation).
+By default the idf should be set on "Flow/zone", but there is the possibility to set "AirChanges/Hour"
+
+
+
